@@ -5,91 +5,168 @@
   <title>AGI Takeover</title>
   <style>
     body {
+      margin: 0;
       background: black;
-      color: #00ffea;
+      color: white;
       font-family: 'Courier New', monospace;
-      text-align: center;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
       overflow: hidden;
+      text-align: center;
     }
 
+    .center {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    /* Glitch Text */
     .glitch {
       font-size: 2em;
       font-weight: bold;
-      position: relative;
-      animation: flicker 1.5s infinite;
+      color: #00ffea;
+      text-shadow: 2px 2px #ff004c, -2px -2px #00ffea;
+      animation: glitch 1s infinite;
     }
 
-    @keyframes flicker {
+    @keyframes glitch {
       0% { text-shadow: 2px 2px red, -2px -2px blue; }
       50% { text-shadow: -2px -2px red, 2px 2px blue; }
       100% { text-shadow: 2px 2px red, -2px -2px blue; }
     }
 
-    .hidden {
-      display: none;
+    /* Robot Head */
+    .robot {
+      width: 200px;
+      height: 200px;
+      background: #222;
+      border: 5px solid #00ffea;
+      border-radius: 20px;
+      position: relative;
+      margin: 0 auto 20px;
+      box-shadow: 0 0 30px #00ffea;
+    }
+
+    .eye {
+      width: 40px;
+      height: 40px;
+      background: red;
+      border-radius: 50%;
+      position: absolute;
+      top: 50px;
+      animation: blink 3s infinite;
+    }
+
+    .eye.left { left: 40px; }
+    .eye.right { right: 40px; }
+
+    @keyframes blink {
+      0%, 90%, 100% { height: 40px; }
+      95% { height: 5px; }
+    }
+
+    /* Brain */
+    .brain {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #ff00ff, #550055);
+      margin: 20px auto;
+      box-shadow: 0 0 50px #ff00ff;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); box-shadow: 0 0 30px #ff00ff; }
+      50% { transform: scale(1.3); box-shadow: 0 0 80px #ff00ff; }
+    }
+
+    /* Erased Jobs */
+    .job {
+      font-size: 1.5em;
+      margin: 10px;
+      transition: all 1s ease;
     }
 
     .erased {
       color: red;
       text-decoration: line-through;
-      opacity: 0.5;
+      opacity: 0.3;
     }
 
     #final {
+      display: none;
       font-size: 2.5em;
       color: #ff004c;
-      margin-top: 40px;
-      display: none;
+      text-shadow: 0 0 15px red;
+      margin-top: 20px;
     }
   </style>
 </head>
 <body>
-  <div id="intro1" class="glitch">AI was just the warm-up...</div>
-  <div id="intro2" class="glitch hidden">⚡ AGI is the takeover ⚡</div>
-  
-  <div id="jobs" class="hidden">
-    <div id="job1" class="glitch">Doctor</div>
-    <div id="job2" class="glitch">Engineer</div>
-    <div id="job3" class="glitch">Teacher</div>
-    <div id="job4" class="glitch">Lawyer</div>
-    <div id="job5" class="glitch">Designer</div>
-    <div id="job6" class="glitch">Developer</div>
+  <div class="center">
+    <div id="scene1" class="glitch">AI was just the warm-up...</div>
+    <div id="scene2" class="glitch" style="display:none;">⚡ AGI is the takeover ⚡</div>
+
+    <div id="robotScene" style="display:none;">
+      <div class="robot">
+        <div class="eye left"></div>
+        <div class="eye right"></div>
+      </div>
+      <div class="glitch">The Machine is Awake...</div>
+    </div>
+
+    <div id="brainScene" style="display:none;">
+      <div class="brain"></div>
+      <div class="glitch">AGI Brain > Human Brain</div>
+    </div>
+
+    <div id="jobsScene" style="display:none;">
+      <div id="job1" class="job">Doctor</div>
+      <div id="job2" class="job">Engineer</div>
+      <div id="job3" class="job">Teacher</div>
+      <div id="job4" class="job">Lawyer</div>
+      <div id="job5" class="job">Designer</div>
+      <div id="job6" class="job">Developer</div>
+    </div>
+
+    <div id="final">🚨 No one is safe. Adapt or get replaced. 🚨</div>
   </div>
 
-  <div id="final" class="glitch">🚨 No one is safe. Adapt or get replaced. 🚨</div>
-
   <script>
-    function delay(ms) {
-      return new Promise(resolve => setTimeout(resolve, ms));
-    }
+    function delay(ms){ return new Promise(r => setTimeout(r, ms)); }
 
     async function runDemo() {
-      // Show AI line
+      // Intro
       await delay(2000);
-      document.getElementById("intro2").classList.remove("hidden");
+      document.getElementById("scene1").style.display = "none";
+      document.getElementById("scene2").style.display = "block";
 
-      // Show jobs
+      // Robot appears
       await delay(2000);
-      document.getElementById("intro1").classList.add("hidden");
-      document.getElementById("intro2").classList.add("hidden");
-      document.getElementById("jobs").classList.remove("hidden");
+      document.getElementById("scene2").style.display = "none";
+      document.getElementById("robotScene").style.display = "block";
 
-      const jobIds = ["job1", "job2", "job3", "job4", "job5", "job6"];
-      for (let i = 0; i < jobIds.length; i++) {
+      // Brain appears
+      await delay(3000);
+      document.getElementById("robotScene").style.display = "none";
+      document.getElementById("brainScene").style.display = "block";
+
+      // Jobs appear
+      await delay(3000);
+      document.getElementById("brainScene").style.display = "none";
+      document.getElementById("jobsScene").style.display = "block";
+
+      const jobs = ["job1","job2","job3","job4","job5","job6"];
+      for(let i=0;i<jobs.length;i++){
         await delay(1500);
-        let job = document.getElementById(jobIds[i]);
-        job.classList.add("erased");
-        job.innerText = job.innerText + " → Erased by AGI";
+        document.getElementById(jobs[i]).classList.add("erased");
+        document.getElementById(jobs[i]).innerText += " → Erased by AGI";
       }
 
       // Final message
       await delay(2000);
-      document.getElementById("jobs").classList.add("hidden");
+      document.getElementById("jobsScene").style.display = "none";
       document.getElementById("final").style.display = "block";
     }
 
