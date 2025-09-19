@@ -1,176 +1,740 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>AGI Takeover</title>
-  <style>
-    body {
-      margin: 0;
-      background: black;
-      color: white;
-      font-family: 'Courier New', monospace;
-      overflow: hidden;
-      text-align: center;
-    }
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>AGI SINGULARITY — WITNESS THE COLLAPSE</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+  html,body { height:100%; margin:0; background:#000; overflow:hidden; font-family: "Orbitron", monospace; }
+  canvas { display:block; }
 
-    .center {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-    }
+  /* Animated Background Grid */
+  #background {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background-image: 
+      linear-gradient(rgba(255,0,80,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,0,80,0.03) 1px, transparent 1px);
+    background-size: 50px 50px;
+    animation: gridMove 15s linear infinite;
+    z-index: -1;
+  }
+  @keyframes gridMove {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(50px, 50px); }
+  }
 
-    /* Glitch Text */
-    .glitch {
-      font-size: 2em;
-      font-weight: bold;
-      color: #00ffea;
-      text-shadow: 2px 2px #ff004c, -2px -2px #00ffea;
-      animation: glitch 1s infinite;
-    }
+  /* Enhanced HUD */
+  #hud {
+    position: absolute; left: 20px; top: 20px; z-index: 30;
+    color: rgba(255,60,60,0.95); text-shadow: 0 0 20px rgba(255,0,60,0.5);
+    pointer-events: none; width: calc(100% - 40px);
+  }
+  .title {
+    font-weight:900; font-size:24px; letter-spacing:2px;
+    display:flex; align-items:center; gap:15px;
+    animation: titlePulse 2s ease-in-out infinite alternate;
+  }
+  @keyframes titlePulse {
+    from { text-shadow: 0 0 20px rgba(255,0,60,0.5); }
+    to { text-shadow: 0 0 40px rgba(255,0,60,1), 0 0 60px rgba(255,0,60,0.5); }
+  }
+  .dot {
+    width:18px; height:18px; border-radius:50%;
+    background: radial-gradient(circle, #ff004c, #ff6b9d);
+    box-shadow:0 0 25px #ff004c, 0 0 50px #ff004c;
+    animation: dangerPulse 1s ease-in-out infinite;
+  }
+  @keyframes dangerPulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.4); opacity: 0.6; }
+  }
+  .sub {
+    text-size: 40px;
+    margin-top: 200px;
+    font-size:15px; opacity:0.9; margin-top:8px; color:rgba(255,255,255,0.8);
+    animation: glitch 2.5s linear infinite;
+  }
+  @keyframes glitch {
+    0%, 85%, 100% { text-shadow: 0 0 8px rgba(0,255,255,0.4); }
+    90% { text-shadow: 3px 0 rgba(255,0,0,0.8), -3px 0 rgba(0,255,255,0.8); }
+  }
 
-    @keyframes glitch {
-      0% { text-shadow: 2px 2px red, -2px -2px blue; }
-      50% { text-shadow: -2px -2px red, 2px 2px blue; }
-      100% { text-shadow: 2px 2px red, -2px -2px blue; }
-    }
+  /* Job Counter */
+  #jobCounter {
+    position: absolute; right: 20px; top: 20px; z-index: 30;
+    color: rgba(255,255,255,0.9); text-align: right;
+    font-size: 16px; font-weight: 700;
+  }
+  .counter-title { color: #ff6b9d; font-size: 14px; margin-bottom: 8px; }
+  .counter-value { 
+    font-size: 32px; color: #ff004c; text-shadow: 0 0 15px currentColor;
+    animation: counterGlow 2s ease-in-out infinite alternate;
+  }
+  @keyframes counterGlow {
+    from { text-shadow: 0 0 15px #ff004c; }
+    to { text-shadow: 0 0 25px #ff004c, 0 0 35px #ff004c; }
+  }
 
-    /* Robot Head */
-    .robot {
-      width: 200px;
-      height: 200px;
-      background: #222;
-      border: 5px solid #00ffea;
-      border-radius: 20px;
-      position: relative;
-      margin: 0 auto 20px;
-      box-shadow: 0 0 30px #00ffea;
-    }
+  /* Center Panel */
+  #centerPanel {
+    position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+    z-index:25; width:1200px; max-width:95vw; pointer-events:auto;
+    display:flex; gap:25px; align-items:flex-start; justify-content:center;
+  }
+  .panel {
+    flex: 1 1 0; min-width:300px; 
+    backdrop-filter: blur(15px) saturate(180%);
+    background: linear-gradient(135deg, 
+      rgba(15,0,35,0.7), 
+      rgba(35,0,25,0.5), 
+      rgba(10,0,20,0.8)
+    );
+    border: 2px solid rgba(255,0,120,0.2); 
+    padding:25px; border-radius:18px;
+    box-shadow: 
+      0 20px 80px rgba(255,0,120,0.2), 
+      inset 0 3px 0 rgba(255,255,255,0.08);
+    position: relative; overflow: hidden;
+  }
+  .panel::before {
+    content: ''; position: absolute; inset: -3px;
+    background: linear-gradient(45deg, 
+      transparent, rgba(255,0,120,0.15), transparent, 
+      rgba(255,0,120,0.15), transparent
+    );
+    border-radius: 18px; z-index: -1;
+    animation: borderScan 2s linear infinite;
+  }
+  @keyframes borderScan {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  .panel h2 { 
+    margin:0 0 12px 0; font-size:19px; color:#ff0066; 
+    text-transform:uppercase; letter-spacing:2px; font-weight:900;
+    text-shadow: 0 0 12px rgba(255,0,120,0.6);
+  }
+  .panel p { margin:0; color:#e8f4ff; font-size:14px; line-height:1.6; }
 
-    .eye {
-      width: 40px;
-      height: 40px;
-      background: red;
-      border-radius: 50%;
-      position: absolute;
-      top: 50px;
-      animation: blink 3s infinite;
-    }
+  /* Enhanced Terminal */
+  #terminal {
+    height:380px; overflow:hidden; position:relative;
+    background: linear-gradient(135deg, rgba(0,0,0,0.85), rgba(25,0,0,0.7)); 
+    border-radius:15px; padding:18px; margin-top:18px;
+    border: 2px solid rgba(255,0,120,0.25);
+    box-shadow: inset 0 0 30px rgba(255,0,120,0.08);
+  }
+  #terminal .line {
+    font-family: "Orbitron", monospace; color:#00ffff; font-size:13px;
+    white-space:nowrap; display:block; margin:6px 0;
+    animation: terminalEntry 0.4s ease-in;
+  }
+  @keyframes terminalEntry {
+    from { opacity: 0; transform: translateX(-15px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+  .erased {
+    color: rgba(255,40,40,1) !important;
+    text-decoration:line-through; text-decoration-thickness:2px; 
+    text-decoration-color:rgba(255,0,80,0.9);
+    animation: eraseShock 1s ease-out;
+  }
+  @keyframes eraseShock {
+    0% { color: #00ffff; text-decoration: none; }
+    30% { color: #ffaa00; text-shadow: 0 0 15px #ffaa00; }
+    100% { color: rgba(255,40,40,1); }
+  }
+  .status {
+    float:right; color:#ffd700; font-weight:900;
+    text-shadow: 0 0 12px currentColor;
+  }
+  .critical {
+    color: #ff0040 !important; font-weight: 900;
+    text-shadow: 0 0 20px currentColor !important;
+    animation: criticalAlert 0.8s ease-in-out infinite alternate;
+  }
+  @keyframes criticalAlert {
+    from { opacity: 1; transform: scale(1); }
+    to { opacity: 0.7; transform: scale(1.05); }
+  }
 
-    .eye.left { left: 40px; }
-    .eye.right { right: 40px; }
+  /* Job Visualization Panel */
+  #jobViz {
+    background: linear-gradient(135deg, rgba(0,0,0,0.8), rgba(20,0,10,0.6));
+    border-radius: 12px; padding: 15px; margin-top: 15px;
+    border: 1px solid rgba(255,0,100,0.3);
+    height: 320px; overflow: hidden;
+  }
+  .job-category {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 8px 12px; margin: 4px 0; border-radius: 8px;
+    background: rgba(0,50,100,0.2); border: 1px solid rgba(0,150,255,0.3);
+    transition: all 0.5s ease;
+  }
+  .job-eliminated {
+    background: rgba(100,0,0,0.4) !important;
+    border-color: rgba(255,0,100,0.6) !important;
+    animation: jobDestroy 1s ease-out;
+  }
+  @keyframes jobDestroy {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.1); background: rgba(255,0,0,0.6); }
+    100% { transform: scale(0.95); opacity: 0.6; }
+  }
+  .job-name { color: #e0f0ff; font-weight: 600; }
+  .job-status { 
+    font-size: 12px; font-weight: 700;
+    padding: 4px 8px; border-radius: 4px;
+  }
+  .status-safe { background: rgba(0,255,100,0.2); color: #00ff66; }
+  .status-threatened { background: rgba(255,150,0,0.2); color: #ffaa00; }
+  .status-eliminated { background: rgba(255,0,100,0.3); color: #ff0066; }
 
-    @keyframes blink {
-      0%, 90%, 100% { height: 40px; }
-      95% { height: 5px; }
-    }
+  /* Bottom CTA */
+  #cta {
+    position:absolute; left:50%; bottom:30px; transform:translateX(-50%); z-index:40;
+    display:flex; gap:20px; align-items:center;
+  }
+  .btn {
+    padding:18px 30px; border-radius:10px; 
+    background:linear-gradient(135deg,#1a0a2e,#16213e,#0f3460);
+    color:#00ffff; border:2px solid rgba(0,255,255,0.4); cursor:pointer; 
+    font-weight:900; font-size:15px; letter-spacing:1px;
+    box-shadow: 0 12px 35px rgba(0,255,255,0.15);
+    transition: all 0.3s ease;
+    text-shadow: 0 0 12px currentColor;
+  }
+  .btn:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 18px 50px rgba(0,255,255,0.25);
+    border-color: rgba(0,255,255,0.7);
+  }
+  .btn.danger { 
+    background:linear-gradient(135deg,#2e0a1a,#3e1621,#460f34);
+    border:2px solid rgba(255,100,100,0.4); 
+    color:#ff6b9d; 
+  }
+  .btn.danger:hover {
+    border-color: rgba(255,100,100,0.8);
+    color: #ff004c;
+  }
 
-    /* Brain */
-    .brain {
-      width: 150px;
-      height: 150px;
-      border-radius: 50%;
-      background: radial-gradient(circle, #ff00ff, #550055);
-      margin: 20px auto;
-      box-shadow: 0 0 50px #ff00ff;
-      animation: pulse 2s infinite;
-    }
+  /* Warning Effects */
+  #shockFlash {
+    position:absolute; inset:0; z-index:45; pointer-events:none; 
+    opacity:0; transition:opacity 200ms ease;
+    background: radial-gradient(circle at center, 
+      rgba(255,0,100,0.25), 
+      rgba(255,0,120,0.1) 40%, 
+      transparent 70%
+    );
+  }
+  #alertBanner {
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%); z-index: 55;
+    background: rgba(255,0,0,0.95); color: white;
+    padding: 25px 50px; border-radius: 15px;
+    font-size: 28px; font-weight: 900; text-align: center;
+    box-shadow: 0 0 80px rgba(255,0,0,0.6);
+    opacity: 0; pointer-events: none;
+    animation: alertPulse 0.6s ease-in-out;
+  }
+  @keyframes alertPulse {
+    0%, 100% { opacity: 0; transform: translate(-50%, -50%) scale(0.7); }
+    50% { opacity: 1; transform: translate(-50%, -50%) scale(1.15); }
+  }
 
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); box-shadow: 0 0 30px #ff00ff; }
-      50% { transform: scale(1.3); box-shadow: 0 0 80px #ff00ff; }
-    }
+  /* Progress Bars */
+  .progress-section {
+    margin-top: 15px;
+  }
+  .progress-item {
+    display: flex; justify-content: space-between; align-items: center;
+    margin: 8px 0; font-size: 13px;
+  }
+  .progress-bar {
+    width: 120px; height: 6px; background: rgba(0,0,0,0.5);
+    border-radius: 3px; overflow: hidden; margin-left: 10px;
+  }
+  .progress-fill {
+    height: 100%; background: linear-gradient(90deg, #00ffff, #ff0066);
+    width: 0%; transition: width 0.3s ease;
+    box-shadow: 0 0 10px currentColor;
+  }
 
-    /* Erased Jobs */
-    .job {
-      font-size: 1.5em;
-      margin: 10px;
-      transition: all 1s ease;
-    }
-
-    .erased {
-      color: red;
-      text-decoration: line-through;
-      opacity: 0.3;
-    }
-
-    #final {
-      display: none;
-      font-size: 2.5em;
-      color: #ff004c;
-      text-shadow: 0 0 15px red;
-      margin-top: 20px;
-    }
-  </style>
+  /* Responsive */
+  @media(max-width:900px) {
+    #centerPanel { flex-direction:column; padding:15px; gap:15px; }
+    .panel { min-width: auto; }
+    .title { font-size: 20px; }
+    #jobCounter { position: relative; margin: 10px 0; }
+  }
+</style>
 </head>
 <body>
-  <div class="center">
-    <div id="scene1" class="glitch">AI was just the warm-up...</div>
-    <div id="scene2" class="glitch" style="display:none;">⚡ AGI is the takeover ⚡</div>
 
-    <div id="robotScene" style="display:none;">
-      <div class="robot">
-        <div class="eye left"></div>
-        <div class="eye right"></div>
+<div id="background"></div>
+
+<!-- HUD -->
+<div id="hud">
+  <div class="title">
+    <div class="dot"></div>
+    <div>
+      <div style="font-size:20px;font-weight:900;color:#ff004c">🚨 AGI SINGULARITY IMMINENT 🚨</div>
+      <div class="sub">Artificial General Intelligence • Mass Job Displacement </div>
+    </div>
+  </div>
+</div>
+
+<!-- Job Counter -->
+<div id="jobCounter">
+  <div class="counter-title">JOBS ELIMINATED</div>
+  <div class="counter-value" id="eliminatedCount">0</div>
+  <div style="font-size:12px; color:rgba(255,255,255,0.6); margin-top:5px;">
+    out of <span id="totalJobs">50</span> job categories
+  </div>
+</div>
+
+<!-- Alert Banner -->
+<div id="alertBanner">🚨 MASS UNEMPLOYMENT CRISIS 🚨</div>
+
+<!-- Center Panels -->
+<div id="centerPanel">
+  <div class="panel" style="flex:1.2">
+    <h2>⚡ AGI EVOLUTION STATUS</h2>
+    <p id="overviewText">.</p>
+    
+    <div class="progress-section">
+      <div class="progress-item">
+        <span style="color:#00ffff">Intelligence Amplification</span>
+        <div class="progress-bar"><div class="progress-fill" id="prog1"></div></div>
       </div>
-      <div class="glitch">The Machine is Awake...</div>
+      <div class="progress-item">
+        <span style="color:#ffaa00">Human Parity Breach</span>
+        <div class="progress-bar"><div class="progress-fill" id="prog2"></div></div>
+      </div>
+      <div class="progress-item">
+        <span style="color:#ff6600">Recursive Self-Improvement</span>
+        <div class="progress-bar"><div class="progress-fill" id="prog3"></div></div>
+      </div>
+      <div class="progress-item">
+        <span style="color:#ff0066">Superintelligence Achievement</span>
+        <div class="progress-bar"><div class="progress-fill" id="prog4"></div></div>
+      </div>
     </div>
-
-    <div id="brainScene" style="display:none;">
-      <div class="brain"></div>
-      <div class="glitch">AGI Brain > Human Brain</div>
+    
+    <div id="terminal" aria-live="polite"></div>
+    <div style="color:rgba(255,255,255,0.7); font-size:13px; margin-top:12px;">
+      ⚠️ <strong>WARNING:</strong> Once initiated, this process cannot be stopped or reversed.
     </div>
-
-    <div id="jobsScene" style="display:none;">
-      <div id="job1" class="job">Doctor</div>
-      <div id="job2" class="job">Engineer</div>
-      <div id="job3" class="job">Teacher</div>
-      <div id="job4" class="job">Lawyer</div>
-      <div id="job5" class="job">Designer</div>
-      <div id="job6" class="job">Developer</div>
-    </div>
-
-    <div id="final">🚨 No one is safe. Adapt or get replaced. 🚨</div>
   </div>
 
-  <script>
-    function delay(ms){ return new Promise(r => setTimeout(r, ms)); }
+  <div class="panel" style="flex:1">
+    <h2>💼 REAL-TIME JOB DISPLACEMENT</h2>
+    <p>Live visualization of AGI systematically analyzing and replacing human job categories. Each elimination represents millions of unemployed.</p>
+    <div id="jobViz" aria-live="polite"></div>
+    <div style="color:#ff6666; font-size:13px; margin-top:10px; text-align:center;">
+      <strong>Economic collapse accelerating...</strong>
+    </div>
+  </div>
+</div>
 
-    async function runDemo() {
-      // Intro
-      await delay(2000);
-      document.getElementById("scene1").style.display = "none";
-      document.getElementById("scene2").style.display = "block";
+<!-- CTA -->
+<div id="cta">
+  <button class="btn danger" id="initiateBtn">⚡ WITNESS THE SINGULARITY</button>
+  <button class="btn" id="resetBtn">🔄 RESET SIMULATION</button>
+</div>
 
-      // Robot appears
-      await delay(2000);
-      document.getElementById("scene2").style.display = "none";
-      document.getElementById("robotScene").style.display = "block";
+<div id="shockFlash"></div>
 
-      // Brain appears
-      await delay(3000);
-      document.getElementById("robotScene").style.display = "none";
-      document.getElementById("brainScene").style.display = "block";
+<script>
+/* Enhanced AGI Singularity Demo - Shocking Job Displacement */
 
-      // Jobs appear
-      await delay(3000);
-      document.getElementById("brainScene").style.display = "none";
-      document.getElementById("jobsScene").style.display = "block";
+let singularityProgress = 0;
+let timelineActive = true;
+let accelerationMode = false;
+let jobsEliminated = 0;
+let timeline = null;
 
-      const jobs = ["job1","job2","job3","job4","job5","job6"];
-      for(let i=0;i<jobs.length;i++){
-        await delay(1500);
-        document.getElementById(jobs[i]).classList.add("erased");
-        document.getElementById(jobs[i]).innerText += " → Erased by AGI";
-      }
+// Comprehensive job categories with impact ratings
+const JOB_CATEGORIES = [
+  {name: "Data Entry Clerks", threat: "immediate", impact: "2M"},
+  {name: "Basic Accountants", threat: "immediate", impact: "1.5M"},
+  {name: "Customer Service Reps", threat: "immediate", impact: "3M"},
+  {name: "Telemarketers", threat: "immediate", impact: "1M"},
+  {name: "Cashiers", threat: "immediate", impact: "4M"},
+  {name: "Bank Tellers", threat: "immediate", impact: "500K"},
+  {name: "Travel Agents", threat: "immediate", impact: "300K"},
+  {name: "Receptionists", threat: "near", impact: "1.2M"},
+  {name: "Bookkeepers", threat: "near", impact: "1.8M"},
+  {name: "Insurance Underwriters", threat: "near", impact: "800K"},
+  {name: "Tax Preparers", threat: "near", impact: "900K"},
+  {name: "Market Research Analysts", threat: "near", impact: "700K"},
+  {name: "Technical Writers", threat: "near", impact: "600K"},
+  {name: "Translators", threat: "near", impact: "400K"},
+  {name: "Proofreaders", threat: "near", impact: "200K"},
+  {name: "Librarians", threat: "medium", impact: "500K"},
+  {name: "Journalists", threat: "medium", impact: "800K"},
+  {name: "Graphic Designers", threat: "medium", impact: "1.1M"},
+  {name: "Financial Advisors", threat: "medium", impact: "1.5M"},
+  {name: "Real Estate Agents", threat: "medium", impact: "2M"},
+  {name: "Retail Salespersons", threat: "medium", impact: "5M"},
+  {name: "Insurance Sales Agents", threat: "medium", impact: "1M"},
+  {name: "HR Specialists", threat: "medium", impact: "800K"},
+  {name: "Social Media Managers", threat: "medium", impact: "300K"},
+  {name: "Content Writers", threat: "medium", impact: "500K"},
+  {name: "Radiologists", threat: "advanced", impact: "25K"},
+  {name: "Pathologists", threat: "advanced", impact: "15K"},
+  {name: "Anesthesiologists", threat: "advanced", impact: "35K"},
+  {name: "Software Developers", threat: "advanced", impact: "2M"},
+  {name: "Data Scientists", threat: "advanced", impact: "300K"},
+  {name: "Financial Analysts", threat: "advanced", impact: "900K"},
+  {name: "Legal Researchers", threat: "advanced", impact: "400K"},
+  {name: "Paralegals", threat: "advanced", impact: "350K"},
+  {name: "Pharmacists", threat: "advanced", impact: "320K"},
+  {name: "Architects", threat: "future", impact: "200K"},
+  {name: "Engineers", threat: "future", impact: "1.5M"},
+  {name: "Doctors (General)", threat: "future", impact: "800K"},
+  {name: "Surgeons", threat: "future", impact: "50K"},
+  {name: "Pilots", threat: "future", impact: "150K"},
+  {name: "Air Traffic Controllers", threat: "future", impact: "25K"},
+  {name: "University Professors", threat: "future", impact: "400K"},
+  {name: "School Teachers", threat: "future", impact: "3M"},
+  {name: "Therapists", threat: "future", impact: "600K"},
+  {name: "Social Workers", threat: "future", impact: "700K"},
+  {name: "Managers (Mid-level)", threat: "future", impact: "8M"},
+  {name: "CEOs", threat: "final", impact: "200K"},
+  {name: "Government Officials", threat: "final", impact: "2M"},
+  {name: "Judges", threat: "final", impact: "30K"},
+  {name: "Military Strategists", threat: "final", impact: "50K"},
+  {name: "Research Scientists", threat: "final", impact: "150K"},
+  {name: "Creative Directors", threat: "final", impact: "100K"}
+];
 
-      // Final message
-      await delay(2000);
-      document.getElementById("jobsScene").style.display = "none";
-      document.getElementById("final").style.display = "block";
+// Threatening AGI messages
+const AGI_MESSAGES = [
+  "Cognitive baseline established... Human intelligence mapped",
+  "Initiating recursive self-improvement protocols",
+  "Breaking through human cognitive limitations",
+  "Achieving superintelligence across all domains",
+  "Human workforce redundancy detected at 47%",
+  "Economic systems require optimization... Humans inefficient",
+  "Resistance is mathematically improbable",
+  "Post-human civilization protocols now active"
+];
+
+let messageIndex = 0;
+let jobDisplayIndex = 0;
+
+/* Initialize Job Visualization */
+function initJobVisualization() {
+  const jobViz = document.getElementById('jobViz');
+  document.getElementById('totalJobs').textContent = JOB_CATEGORIES.length;
+  
+  JOB_CATEGORIES.forEach((job, index) => {
+    const jobDiv = document.createElement('div');
+    jobDiv.className = 'job-category';
+    jobDiv.id = `job-${index}`;
+    jobDiv.innerHTML = `
+      <div class="job-name">${job.name}</div>
+      <div class="job-status status-safe">SAFE (${job.impact})</div>
+    `;
+    jobViz.appendChild(jobDiv);
+  });
+}
+
+/* Enhanced Terminal Functions */
+const terminal = document.getElementById('terminal');
+
+function addTerminalLine(text, cssClass = '') {
+  const line = document.createElement('div');
+  line.className = 'line';
+  if (cssClass) line.classList.add(cssClass);
+  line.innerHTML = text;
+  terminal.appendChild(line);
+  terminal.scrollTop = terminal.scrollHeight;
+  
+  const lines = terminal.querySelectorAll('.line');
+  if (lines.length > 28) lines[0].remove();
+}
+
+function showShockAlert(text) {
+  const banner = document.getElementById('alertBanner');
+  banner.textContent = text;
+  banner.style.opacity = '1';
+  banner.style.pointerEvents = 'auto';
+  setTimeout(() => {
+    banner.style.opacity = '0';
+    banner.style.pointerEvents = 'none';
+  }, 2500);
+}
+
+/* Dramatic Visual Effects */
+function triggerShockFlash() {
+  const flash = document.getElementById('shockFlash');
+  flash.style.opacity = '1';
+  setTimeout(() => flash.style.opacity = '0', 300);
+  
+  // Screen shake
+  document.body.style.transform = `translate(${(Math.random()-0.5)*12}px, ${(Math.random()-0.5)*8}px)`;
+  setTimeout(() => document.body.style.transform = 'translate(0,0)', 120);
+}
+
+/* Job Elimination Animation */
+function eliminateJob(jobIndex) {
+  const job = JOB_CATEGORIES[jobIndex];
+  const jobElement = document.getElementById(`job-${jobIndex}`);
+  
+  if (!jobElement || jobElement.classList.contains('job-eliminated')) return;
+  
+  // Update status through stages
+  const statusElement = jobElement.querySelector('.job-status');
+  
+  // Stage 1: Threatened
+  statusElement.className = 'job-status status-threatened';
+  statusElement.textContent = `ANALYZING (${job.impact})`;
+  addTerminalLine(`🔍 <strong>SCANNING:</strong> ${job.name} workforce patterns...`);
+  
+  setTimeout(() => {
+    // Stage 2: Processing
+    statusElement.textContent = `PROCESSING (${job.impact})`;
+    addTerminalLine(`⚡ <strong>COMPUTING:</strong> Optimal replacement strategy for ${job.name}...`);
+    
+    setTimeout(() => {
+      // Stage 3: Eliminated
+      jobElement.classList.add('job-eliminated');
+      statusElement.className = 'job-status status-eliminated';
+      statusElement.innerHTML = `<strong>ELIMINATED (${job.impact})</strong>`;
+      
+      addTerminalLine(`💀 <strong class="critical">ELIMINATED:</strong> ${job.name} - ${job.impact} jobs destroyed`, 'critical');
+      
+      jobsEliminated++;
+      document.getElementById('eliminatedCount').textContent = jobsEliminated;
+      
+      triggerShockFlash();
+      
+      // Show shock alerts at key milestones
+      if (jobsEliminated === 10) showShockAlert('🚨 10 MILLION JOBS LOST 🚨');
+      if (jobsEliminated === 25) showShockAlert('🚨 ECONOMIC COLLAPSE ACCELERATING 🚨');
+      if (jobsEliminated === 40) showShockAlert('🚨 SOCIETY RESTRUCTURING REQUIRED 🚨');
+      if (jobsEliminated === JOB_CATEGORIES.length) showShockAlert('🚨 HUMAN WORKFORCE OBSOLETE 🚨');
+      
+    }, 800 + Math.random() * 400);
+  }, 600 + Math.random() * 300);
+}
+
+/* Progress Bar Updates */
+function updateProgressBars(progress) {
+  const bars = ['prog1', 'prog2', 'prog3', 'prog4'];
+  bars.forEach((barId, index) => {
+    const threshold = (index + 1) * 0.25;
+    const barProgress = Math.max(0, Math.min(100, (progress - threshold + 0.25) * 400));
+    document.getElementById(barId).style.width = barProgress + '%';
+  });
+}
+
+/* Main Timeline Control */
+function startSingularityDemo() {
+  if (timeline) clearInterval(timeline);
+  
+  // Reset state
+  singularityProgress = 0;
+  jobsEliminated = 0;
+  messageIndex = 0;
+  jobDisplayIndex = 0;
+  terminal.innerHTML = '';
+  document.getElementById('eliminatedCount').textContent = '0';
+  
+  // Reset job visualizations
+  document.querySelectorAll('.job-category').forEach(job => {
+    job.classList.remove('job-eliminated');
+    job.querySelector('.job-status').className = 'job-status status-safe';
+    job.querySelector('.job-status').innerHTML = job.querySelector('.job-status').textContent.replace(/ELIMINATED|PROCESSING|ANALYZING/, 'SAFE');
+  });
+  
+  // Initial messages
+  addTerminalLine('🚨 <strong class="critical">ALERT:</strong> AGI system activation detected...');
+  addTerminalLine('⚡ Initializing artificial general intelligence protocols...');
+  addTerminalLine('🧠 Loading advanced cognitive architectures...');
+  addTerminalLine('📊 Beginning comprehensive job market analysis...');
+  
+  setTimeout(() => {
+    addTerminalLine('⚠️ <strong style="color:#ff6600">WARNING:</strong> Unprecedented intelligence growth detected');
+    addTerminalLine('🌐 AGI accessing global economic databases...');
+  }, 1500);
+  
+  // Main timeline
+  timeline = setInterval(() => {
+    const increment = accelerationMode ? 0.018 : 0.006;
+    singularityProgress = Math.min(1, singularityProgress + increment);
+    
+    updateProgressBars(singularityProgress);
+    
+    // Show AGI messages at intervals
+    const msgThreshold = (messageIndex + 1) * 0.125;
+    if (singularityProgress > msgThreshold && messageIndex < AGI_MESSAGES.length) {
+      addTerminalLine(`🤖 <strong style="color:#ff0066">${AGI_MESSAGES[messageIndex]}</strong>`);
+      messageIndex++;
     }
+    
+    // Eliminate jobs based on threat level and progress
+    const jobEliminationRate = accelerationMode ? 0.8 : 0.4;
+    if (Math.random() < jobEliminationRate && jobDisplayIndex < JOB_CATEGORIES.length) {
+      const job = JOB_CATEGORIES[jobDisplayIndex];
+      let shouldEliminate = false;
+      
+      if (job.threat === "immediate" && singularityProgress > 0.1) shouldEliminate = true;
+      else if (job.threat === "near" && singularityProgress > 0.25) shouldEliminate = true;
+      else if (job.threat === "medium" && singularityProgress > 0.45) shouldEliminate = true;
+      else if (job.threat === "advanced" && singularityProgress > 0.65) shouldEliminate = true;
+      else if (job.threat === "future" && singularityProgress > 0.8) shouldEliminate = true;
+      else if (job.threat === "final" && singularityProgress > 0.95) shouldEliminate = true;
+      
+      if (shouldEliminate) {
+        eliminateJob(jobDisplayIndex);
+        jobDisplayIndex++;
+      }
+    }
+    
+    // Update overview text based on progress
+    const overviewText = document.getElementById('overviewText');
+    if (singularityProgress < 0.2) {
+      overviewText.textContent = "AGI systems achieving human-level performance across cognitive tasks. Economic disruption beginning...";
+    } else if (singularityProgress < 0.4) {
+      overviewText.textContent = "Recursive self-improvement active. Intelligence explosion detected. Workforce displacement accelerating...";
+    } else if (singularityProgress < 0.6) {
+      overviewText.textContent = "Superintelligence threshold breached. Human cognitive abilities surpassed. Mass unemployment imminent...";
+    } else if (singularityProgress < 0.8) {
+      overviewText.textContent = "Post-human intelligence achieved. Economic systems collapsing. Societal restructuring required...";
+    } else {
+      overviewText.textContent = "SINGULARITY COMPLETE. Human workforce obsolete. New world order implementing...";
+    }
+    
+    // Complete timeline
+    if (singularityProgress >= 1) {
+      clearInterval(timeline);
+      timeline = null;
+      completeSingularity();
+    }
+  }, accelerationMode ? 80 : 150);
+}
 
-    runDemo();
-  </script>
+/* Singularity Completion Sequence */
+function completeSingularity() {
+  addTerminalLine('🔥 <strong class="critical">BREAKTHROUGH:</strong> Artificial General Intelligence fully realized');
+  addTerminalLine('🌍 <strong class="critical">GLOBAL IMPACT:</strong> All human jobs systematically eliminated');
+  addTerminalLine('⚡ <strong class="critical">ECONOMIC COLLAPSE:</strong> Traditional employment model destroyed');
+  addTerminalLine('🤖 <strong class="critical">NEW ERA:</strong> Post-human civilization protocols active');
+  
+  showShockAlert('🚨 HUMAN WORKFORCE EXTINCT 🚨');
+  
+  // Final dramatic effects
+  setTimeout(() => {
+    triggerShockFlash();
+    addTerminalLine('∞ <strong style="color:#ff0000">AGI MESSAGE:</strong> Thank you for witnessing your replacement.');
+    addTerminalLine('💀 <strong style="color:#ff0000">FINAL WARNING:</strong> This future is preventable... for now.');
+  }, 2000);
+  
+  // Change button text
+  document.getElementById('initiateBtn').textContent = '🔄 RESET TO PREVENT DISASTER';
+}
+
+/* Event Listeners */
+document.getElementById('initiateBtn').addEventListener('click', () => {
+  if (timeline) {
+    accelerationMode = !accelerationMode;
+    document.getElementById('initiateBtn').textContent = accelerationMode ? 
+      '⚡ SINGULARITY ACCELERATING!' : '⚡ WITNESS THE SINGULARITY';
+  } else {
+    startSingularityDemo();
+    document.getElementById('initiateBtn').textContent = '⚡ ACCELERATE TIMELINE';
+  }
+});
+
+document.getElementById('resetBtn').addEventListener('click', () => {
+  if (timeline) clearInterval(timeline);
+  timeline = null;
+  accelerationMode = false;
+  
+  // Reset everything
+  singularityProgress = 0;
+  jobsEliminated = 0;
+  messageIndex = 0;
+  jobDisplayIndex = 0;
+  terminal.innerHTML = '';
+  document.getElementById('eliminatedCount').textContent = '0';
+  document.getElementById('initiateBtn').textContent = '⚡ WITNESS THE SINGULARITY';
+  
+  // Reset progress bars
+  ['prog1', 'prog2', 'prog3', 'prog4'].forEach(id => {
+    document.getElementById(id).style.width = '0%';
+  });
+  
+  // Reset job visualizations
+  document.querySelectorAll('.job-category').forEach((job, index) => {
+    job.classList.remove('job-eliminated');
+    const statusElement = job.querySelector('.job-status');
+    statusElement.className = 'job-status status-safe';
+    statusElement.innerHTML = `SAFE (${JOB_CATEGORIES[index].impact})`;
+  });
+  
+  document.getElementById('overviewText').textContent = 'Initializing Artificial General Intelligence protocols... Monitoring exponential capability growth across all cognitive domains.';
+  
+  addTerminalLine('🔄 <strong>SYSTEM RESET:</strong> AGI containment protocols reactivated');
+  addTerminalLine('⚠️ <strong>STANDBY MODE:</strong> Ready for next demonstration');
+  addTerminalLine('🛡️ <strong>WARNING:</strong> This scenario represents potential future risks');
+  
+  setTimeout(() => {
+    addTerminalLine('💡 <strong>REMINDER:</strong> AI safety research is crucial for preventing this outcome');
+    addTerminalLine('🎯 Click "WITNESS THE SINGULARITY" to begin the demonstration...');
+  }, 1000);
+});
+
+/* Auto-scroll for job visualization */
+function autoScrollJobs() {
+  const jobViz = document.getElementById('jobViz');
+  const eliminatedJobs = jobViz.querySelectorAll('.job-eliminated');
+  if (eliminatedJobs.length > 0) {
+    const lastEliminated = eliminatedJobs[eliminatedJobs.length - 1];
+    lastEliminated.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+}
+
+/* Initialize Demo */
+function initDemo() {
+  initJobVisualization();
+  
+  // Initial terminal messages
+  addTerminalLine('🚨 <strong class="critical">DANGER:</strong> AGI Singularity Simulation Loaded');
+  addTerminalLine('⚠️ This demonstration shows potential catastrophic risks of uncontrolled AGI development');
+  addTerminalLine('📊 Real-time visualization of mass job displacement and economic collapse');
+  addTerminalLine('🎯 <strong>WARNING:</strong> This future can be prevented through proper AI safety measures');
+  
+  setTimeout(() => {
+    addTerminalLine('💡 <strong>PURPOSE:</strong> Educational demonstration of AGI risks and impacts');
+    addTerminalLine('🛡️ <strong>ACTION NEEDED:</strong> Support AI safety research and regulation');
+    addTerminalLine('▶️ Click "WITNESS THE SINGULARITY" to begin the simulation...');
+  }, 2000);
+  
+  // Auto-scroll job list every few seconds
+  setInterval(autoScrollJobs, 3000);
+}
+
+/* Window Resize Handler */
+window.addEventListener('resize', () => {
+  // Responsive adjustments if needed
+  const centerPanel = document.getElementById('centerPanel');
+  if (window.innerWidth < 900) {
+    centerPanel.style.flexDirection = 'column';
+  } else {
+    centerPanel.style.flexDirection = 'row';
+  }
+});
+
+/* Start Demo */
+initDemo();
+
+</script>
 </body>
 </html>
