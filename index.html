@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AGI Takeover</title>
+  <style>
+    body {
+      background: black;
+      color: #00ffea;
+      font-family: 'Courier New', monospace;
+      text-align: center;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .glitch {
+      font-size: 2em;
+      font-weight: bold;
+      position: relative;
+      animation: flicker 1.5s infinite;
+    }
+
+    @keyframes flicker {
+      0% { text-shadow: 2px 2px red, -2px -2px blue; }
+      50% { text-shadow: -2px -2px red, 2px 2px blue; }
+      100% { text-shadow: 2px 2px red, -2px -2px blue; }
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .erased {
+      color: red;
+      text-decoration: line-through;
+      opacity: 0.5;
+    }
+
+    #final {
+      font-size: 2.5em;
+      color: #ff004c;
+      margin-top: 40px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="intro1" class="glitch">AI was just the warm-up...</div>
+  <div id="intro2" class="glitch hidden">⚡ AGI is the takeover ⚡</div>
+  
+  <div id="jobs" class="hidden">
+    <div id="job1" class="glitch">Doctor</div>
+    <div id="job2" class="glitch">Engineer</div>
+    <div id="job3" class="glitch">Teacher</div>
+    <div id="job4" class="glitch">Lawyer</div>
+    <div id="job5" class="glitch">Designer</div>
+    <div id="job6" class="glitch">Developer</div>
+  </div>
+
+  <div id="final" class="glitch">🚨 No one is safe. Adapt or get replaced. 🚨</div>
+
+  <script>
+    function delay(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    async function runDemo() {
+      // Show AI line
+      await delay(2000);
+      document.getElementById("intro2").classList.remove("hidden");
+
+      // Show jobs
+      await delay(2000);
+      document.getElementById("intro1").classList.add("hidden");
+      document.getElementById("intro2").classList.add("hidden");
+      document.getElementById("jobs").classList.remove("hidden");
+
+      const jobIds = ["job1", "job2", "job3", "job4", "job5", "job6"];
+      for (let i = 0; i < jobIds.length; i++) {
+        await delay(1500);
+        let job = document.getElementById(jobIds[i]);
+        job.classList.add("erased");
+        job.innerText = job.innerText + " → Erased by AGI";
+      }
+
+      // Final message
+      await delay(2000);
+      document.getElementById("jobs").classList.add("hidden");
+      document.getElementById("final").style.display = "block";
+    }
+
+    runDemo();
+  </script>
+</body>
+</html>
